@@ -1,0 +1,4 @@
+psutil
+PyQt6
+pyqtgraph
+pyinstaller
