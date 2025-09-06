@@ -1,9 +1,13 @@
 import json
+from pathlib import Path
 from PyQt6.QtWidgets import (
     QDialog, QVBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QHBoxLayout, QLineEdit, QComboBox,
     QDialogButtonBox, QFormLayout, QLabel, QSpinBox
 )
+
+# Define the absolute path to the rules.json file
+RULES_FILE_PATH = Path(__file__).parent / "rules.json"
 
 class RuleDialog(QDialog):
     """
@@ -84,9 +88,13 @@ class SettingsWindow(QDialog):
 
     def load_rules(self):
         try:
-            with open("python_memory_sentinel/rules.json", "r") as f:
+            if not RULES_FILE_PATH.exists():
+                RULES_FILE_PATH.touch()
+                self.rules = []
+                return
+            with open(RULES_FILE_PATH, "r") as f:
                 self.rules = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
+        except (FileNotFoundError, json.JSONDecodeError, PermissionError):
             self.rules = []
 
         self.rules_table.setRowCount(0)
@@ -99,8 +107,12 @@ class SettingsWindow(QDialog):
             self.rules_table.setItem(row, 4, QTableWidgetItem(rule.get("action", "")))
 
     def save_rules(self):
-        with open("python_memory_sentinel/rules.json", "w") as f:
-            json.dump(self.rules, f, indent=4)
+        try:
+            with open(RULES_FILE_PATH, "w") as f:
+                json.dump(self.rules, f, indent=4)
+        except PermissionError:
+            # Handle cases where the file cannot be written
+            pass
         self.load_rules()
 
     def add_rule(self):

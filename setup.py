@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="PythonMemorySentinel",
-    version="1.0.0",
+    name="ProcessSentinel",
+    version="1.1.0",
     author="Jules",
-    description="A utility to monitor and manage Python processes.",
+    description="A utility to monitor and manage Python and Node.js processes.",
     packages=find_packages(),
     entry_points={
         'gui_scripts': [

@@ -11,14 +11,14 @@ from PyQt6.QtCore import QTimer, Qt, QThread
 from pyqtgraph import PlotWidget, mkPen
 from collections import deque
 from settings import SettingsWindow
-from core import get_python_processes
+from core import get_monitored_processes
 from worker import SentinelWorker
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setup_worker_thread()
-        self.setWindowTitle("Python Memory Sentinel")
+        self.setWindowTitle("Process Sentinel")
         self.setGeometry(100, 100, 1000, 700)
 
         # Main layout and widget
@@ -128,11 +128,11 @@ class MainWindow(QMainWindow):
 
     def populate_process_list(self):
         """
-        Fetches the list of Python processes and populates the table.
+        Fetches the list of monitored processes and populates the table.
         """
         selected_pid_before_refresh = self.get_selected_pid()
         self.process_table.setRowCount(0)
-        processes = list(get_python_processes())
+        processes = list(get_monitored_processes())
 
         for row, process_data in enumerate(processes):
             self.process_table.insertRow(row)

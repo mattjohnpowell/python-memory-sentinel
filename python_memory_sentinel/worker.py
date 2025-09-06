@@ -1,7 +1,11 @@
 import json
 import time
 import psutil
+from pathlib import Path
 from PyQt6.QtCore import QObject, pyqtSignal
+
+# Define the absolute path to the rules.json file
+RULES_FILE_PATH = Path(__file__).parent / "rules.json"
 
 class SentinelWorker(QObject):
     """
@@ -31,21 +35,25 @@ class SentinelWorker(QObject):
 
     def load_rules(self):
         try:
-            with open("python_memory_sentinel/rules.json", "r") as f:
+            if not RULES_FILE_PATH.exists():
+                self.rules = []
+                return
+            with open(RULES_FILE_PATH, "r") as f:
                 self.rules = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
+        except (FileNotFoundError, json.JSONDecodeError, PermissionError):
             self.rules = []
 
     def check_processes(self):
         """
-        Iterates through running python processes and checks them against the rules.
+        Iterates through running monitored processes and checks them against the rules.
         """
         if not self.rules:
             return
 
+        process_names = {'python.exe', 'pythonw.exe', 'python', 'python3', 'node.exe', 'node'}
         for process in psutil.process_iter(['pid', 'name', 'memory_info', 'cmdline']):
             try:
-                if process.info['name'].lower() not in ('python.exe', 'pythonw.exe', 'python', 'python3'):
+                if process.info['name'].lower() not in process_names:
                     continue
 
                 for rule in self.rules:

@@ -1,12 +1,13 @@
 import psutil
 
-def get_python_processes():
+def get_monitored_processes():
     """
-    Generator that yields information about running Python processes.
+    Generator that yields information about running Python and Node.js processes.
     """
+    process_names = {'python.exe', 'pythonw.exe', 'python', 'python3', 'node.exe', 'node'}
     for process in psutil.process_iter(['pid', 'name', 'memory_info', 'cpu_percent', 'cmdline']):
         try:
-            if process.info['name'].lower() in ('python.exe', 'pythonw.exe', 'python', 'python3'):
+            if process.info['name'].lower() in process_names:
                 # Get memory usage in MB
                 memory_mb = process.info['memory_info'].rss / (1024 * 1024)
                 # Get full command line path
@@ -23,15 +24,15 @@ def get_python_processes():
 
 def main():
     """
-    Main function to display information about running Python processes.
+    Main function to display information about running monitored processes.
     """
-    print("Running Python Processes:")
+    print("Running Monitored Processes (Python and Node.js):")
     print("-" * 50)
 
-    processes = list(get_python_processes())
+    processes = list(get_monitored_processes())
 
     if not processes:
-        print("No Python processes found.")
+        print("No monitored processes found.")
         return
 
     # Find the maximum width for each column to format the output nicely
